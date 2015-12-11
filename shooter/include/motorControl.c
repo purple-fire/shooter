@@ -1,3 +1,4 @@
+// motorControl.c
 #include "motorControl.h"
 
 void setMotorToRamp(unsigned char channel, bool ramp){
