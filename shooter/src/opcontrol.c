@@ -34,45 +34,58 @@
 
 #include "main.h"
 #include "motorControl.c"
+#include <Math.h>
 
 const int MAX_FLYWHEEL_SPEED = 127;
+const int MAX_PICKUP_SPEED = 127;
 
-/*
- * Runs the user operator control code. This function will be started in its own task with the
- * default priority and stack size whenever the robot is enabled via the Field Management System
- * or the VEX Competition Switch in the operator control mode. If the robot is disabled or
- * communications is lost, the operator control task will be stopped by the kernel. Re-enabling
- * the robot will restart the task, not resume it from where it left off.
- *
- * If no VEX Competition Switch or Field Management system is plugged in, the VEX Cortex will
- * run the operator control task. Be warned that this will also occur if the VEX Cortex is
- * tethered directly to a computer via the USB A to A cable without any VEX Joystick attached.
- *
- * Code running in this task can take almost any action, as the VEX Joystick is available and
- * the scheduler is operational. However, proper use of delay() or taskDelayUntil() is highly
- * recommended to give other tasks (including system tasks such as updating LCDs) time to run.
- *
- * This task should never exit; it should end with some kind of infinite loop, even if empty.
- */
+const int LEFT_FLY_OUT = 2;
+const int LEFT_FLY_IN = 3;
+const int RIGHT_FLY_OUT = 4;
+const int RIGHT_FLY_IN = 5;
+
+const int LEFT_BACK_DRIVE = 6;
+const int RIGHT_BACK_DRIVE = 7;
+const int LEFT_FRONT_DRIVE = 1;
+const int RIGHT_FRONT_DRIVE = 10;
+
+const int PICKUP_BELT = 8;
 
 void operatorControl() {
 
-	setMotorReversed(1, true);
-	setMotorReversed(10, true);
+	setMotorReversed(LEFT_FLY_OUT, true);
+	setMotorReversed(RIGHT_FLY_IN, true);
 
-	setMotorToRamp(1, true);
-	setMotorToRamp(2, true);
-	setMotorToRamp(9, true);
-	setMotorToRamp(10, true);
-
-	pinMode(1, OUTPUT);
+	setMotorToRamp(LEFT_FLY_OUT, true);
+	setMotorToRamp(LEFT_FLY_IN, true);
+	setMotorToRamp(RIGHT_FLY_OUT, true);
+	setMotorToRamp(RIGHT_FLY_IN, true);
 
 	beginRampMotorsTask();
 
 	while (1) {
 		int button5U = joystickGetDigital(1,5,JOY_UP);
+		int button6U = joystickGetDigital(1,6,JOY_UP);
+		int button6D = joystickGetDigital(1,6,JOY_DOWN);
+
+		int leftStick = joystickGetAnalog(1, 3);
+		int rightStick = joystickGetAnalog(1, 2);
+
+		setMotorSpeed(LEFT_BACK_DRIVE, leftStick);
+		setMotorSpeed(LEFT_FRONT_DRIVE, leftStick / sqrt(2));
+
+		setMotorSpeed(RIGHT_BACK_DRIVE, rightStick);
+		setMotorSpeed(RIGHT_FRONT_DRIVE, rightStick / sqrt(2));
+
+		if (button6U)
+			setMotorSpeed(PICKUP_BELT, MAX_PICKUP_SPEED);
+		else if (button6D)
+			setMotorSpeed(PICKUP_BELT, -MAX_PICKUP_SPEED);
+		else
+			setMotorSpeed(PICKUP_BELT, 0);
 
 		if(button5U){
+			digitalWrite(1, LOW);
 			rampMotorsUp(MAX_FLYWHEEL_SPEED);
 		}
 		else{

@@ -49,8 +49,8 @@ void rampMotors(){
 			digitalWrite(1, LOW);
 			for (int i = lastSpeed; i < speedTarget; i++){
 				lastSpeed = i;
-				for (int j = 0; j < 12; j++){
-					if (motorsToRamp[j])
+				for (int j = 1; j <= 12; j++){
+					if (motorsToRamp[j-1])
 						setMotorSpeed(j, i);
 				}
 
@@ -58,14 +58,13 @@ void rampMotors(){
 			}
 			rampingUp = false;
 		}
-		digitalWrite(1, HIGH);
 
 		if (speedTarget < lastSpeed){
 			for (int i = lastSpeed; i > speedTarget; i--){
 				lastSpeed = i;
 
-				for (int j = 0; j < 12; j++){
-					if (motorsToRamp[j])
+				for (int j = 1; j <= 12; j++){
+					if (motorsToRamp[j-1])
 						setMotorSpeed(j, i);
 				}
 
