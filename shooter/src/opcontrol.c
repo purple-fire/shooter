@@ -55,6 +55,7 @@ void operatorControl() {
 
 	setMotorReversed(LEFT_FLY_OUT, true);
 	setMotorReversed(RIGHT_FLY_IN, true);
+	setMotorReversed(RIGHT_FRONT_DRIVE, true);
 
 	setMotorToRamp(LEFT_FLY_OUT, true);
 	setMotorToRamp(LEFT_FLY_IN, true);
@@ -69,18 +70,18 @@ void operatorControl() {
 		int button6D = joystickGetDigital(1,6,JOY_DOWN);
 
 		int leftStick = joystickGetAnalog(1, 3);
-		int rightStick = joystickGetAnalog(1, 2);
+		int rightStick = joystickGetAnalog(1, 1);
 
 		setMotorSpeed(LEFT_BACK_DRIVE, leftStick);
-		setMotorSpeed(LEFT_FRONT_DRIVE, leftStick / sqrt(2));
+		setMotorSpeed(LEFT_FRONT_DRIVE, rightStick);
 
-		setMotorSpeed(RIGHT_BACK_DRIVE, rightStick);
-		setMotorSpeed(RIGHT_FRONT_DRIVE, rightStick / sqrt(2));
+		setMotorSpeed(RIGHT_BACK_DRIVE, leftStick);
+		setMotorSpeed(RIGHT_FRONT_DRIVE, rightStick);
 
 		if (button6U)
-			setMotorSpeed(PICKUP_BELT, MAX_PICKUP_SPEED);
-		else if (button6D)
 			setMotorSpeed(PICKUP_BELT, -MAX_PICKUP_SPEED);
+		else if (button6D)
+			setMotorSpeed(PICKUP_BELT, MAX_PICKUP_SPEED);
 		else
 			setMotorSpeed(PICKUP_BELT, 0);
 
