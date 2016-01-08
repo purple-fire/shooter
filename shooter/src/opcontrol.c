@@ -39,13 +39,13 @@
 const int MAX_FLYWHEEL_SPEED = 127;
 const int MAX_PICKUP_SPEED = 127;
 
-const int LEFT_FLY_OUT = 2;
-const int LEFT_FLY_IN = 3;
-const int RIGHT_FLY_OUT = 4;
-const int RIGHT_FLY_IN = 5;
+const int LEFT_FLY_OUT = 4;
+const int LEFT_FLY_IN = 5;
+const int RIGHT_FLY_OUT = 6;
+const int RIGHT_FLY_IN = 7;
 
-const int LEFT_BACK_DRIVE = 6;
-const int RIGHT_BACK_DRIVE = 7;
+const int LEFT_BACK_DRIVE = 2;
+const int RIGHT_BACK_DRIVE = 3;
 const int LEFT_FRONT_DRIVE = 1;
 const int RIGHT_FRONT_DRIVE = 10;
 
@@ -53,9 +53,10 @@ const int PICKUP_BELT = 8;
 
 void operatorControl() {
 
-	setMotorReversed(LEFT_FLY_OUT, true);
-	setMotorReversed(RIGHT_FLY_IN, true);
+	setMotorReversed(LEFT_FLY_IN, true);
+	setMotorReversed(RIGHT_FLY_OUT, true);
 	setMotorReversed(RIGHT_FRONT_DRIVE, true);
+	setMotorReversed(LEFT_BACK_DRIVE, true);
 
 	setMotorToRamp(LEFT_FLY_OUT, true);
 	setMotorToRamp(LEFT_FLY_IN, true);
