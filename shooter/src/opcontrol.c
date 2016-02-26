@@ -34,42 +34,58 @@
 
 #include "main.h"
 #include "motorControl.c"
-#include <Math.h>
 
-const int MAX_FLYWHEEL_SPEED = 69;
-const int MAX_PICKUP_SPEED = 127;
-const int MAX_RELEASE_SPEED = 127;
+// int MAX_FLYWHEEL_SPEED = 69;
+int MAX_PICKUP_SPEED = 127;
+int MAX_RELEASE_SPEED = 127;
 
-const int LEFT_FLY_OUT = 4;
-const int LEFT_FLY_IN = 5;
-const int RIGHT_FLY_OUT = 6;
-const int RIGHT_FLY_IN = 7;
+int LEFT_FLY_OUT = 6;
+int LEFT_FLY_IN = 7;
+int RIGHT_FLY_OUT = 4;
+int RIGHT_FLY_IN = 5;
 
-const int LEFT_BACK_DRIVE = 2;
-const int RIGHT_BACK_DRIVE = 3;
-const int LEFT_FRONT_DRIVE = 1;
-const int RIGHT_FRONT_DRIVE = 10;
+int LEFT_BACK_DRIVE = 2;
+int RIGHT_BACK_DRIVE = 3;
+int LEFT_FRONT_DRIVE = 10;
+int RIGHT_FRONT_DRIVE = 1;
 
-const int PICKUP_BELT = 8;
-const int RAMP_RELEASE = 9;
+int PICKUP_BELT = 8;
+int RAMP_RELEASE = 9;
 
 int modFlywheelSpeed = 0;
+Encoder LFlywheel;
+Encoder RFlywheel;
 
-void operatorControl() {
-	modFlywheelSpeed = MAX_FLYWHEEL_SPEED;
+void intializeIO(){
+	pinMode(1, INPUT);
+	pinMode(2, INPUT);
+	pinMode(3, INPUT);
+	pinMode(4, INPUT);
+}
 
-	setMotorReversed(LEFT_FLY_OUT, true);
-	setMotorReversed(RIGHT_FLY_IN, true);
+void initialize(){
+	LFlywheel = encoderInit(5, 6, false);
+	RFlywheel = encoderInit(7, 8, true);
+
+	modFlywheelSpeed = 1250;
+
+	setMotorReversed(LEFT_FLY_IN, true);
+	setMotorReversed(RIGHT_FLY_OUT, true);
 	setMotorReversed(RIGHT_FRONT_DRIVE, true);
 	setMotorReversed(LEFT_BACK_DRIVE, true);
 
-	setMotorToRamp(LEFT_FLY_OUT, true);
-	setMotorToRamp(LEFT_FLY_IN, true);
-	setMotorToRamp(RIGHT_FLY_OUT, true);
-	setMotorToRamp(RIGHT_FLY_IN, true);
+	setLeftFlywheelMotor(LEFT_FLY_IN, true);
+	setLeftFlywheelMotor(LEFT_FLY_OUT, true);
+	setRightFlywheelMotor(RIGHT_FLY_IN, true);
+	setRightFlywheelMotor(RIGHT_FLY_OUT, true);
+}
 
-	beginRampMotorsTask();
+void driving(){
+	setupEncoder(LFlywheel, 1);
+	setupEncoder(RFlywheel, 2);
 
+	beginEncoderTask();
+	beginFlywheelControlTask();
 	while (1) {
 		int button5U = joystickGetDigital(1,5,JOY_UP);
 		int button6U = joystickGetDigital(1,6,JOY_UP);
@@ -98,26 +114,44 @@ void operatorControl() {
 			setMotorSpeed(PICKUP_BELT, 0);
 
 		if (button7U)
-			modFlywheelSpeed = MAX_FLYWHEEL_SPEED;
+			modFlywheelSpeed = 1400;
 		if (button7D)
-			modFlywheelSpeed = 45;
+			modFlywheelSpeed = 1100;
 		if (button7L)
-			modFlywheelSpeed = 55;
+			modFlywheelSpeed = 1200;
 		if (button7R)
-			modFlywheelSpeed = 65;
-		if(button5U){
-			digitalWrite(1, LOW);
-			rampMotorsUp(modFlywheelSpeed);
-		}
-		else{
-			rampMotorsDown(0);
-		}
+			modFlywheelSpeed = 1300;
+
+		if(button5U)
+			setFlywheelTarget(modFlywheelSpeed);
+		else
+			stopFlywheels();
 
 		if (button5D)
 			setMotorSpeed(RAMP_RELEASE, MAX_RELEASE_SPEED);
 		else
 			setMotorSpeed(RAMP_RELEASE, 0);
 
-		delay(20);
+		delay(10);
 	}
+}
+
+void autonomous(){
+	setupEncoder(LFlywheel, 1);
+	setupEncoder(RFlywheel, 2);
+
+	beginEncoderTask();
+	beginFlywheelControlTask();
+
+	setFlywheelTarget(1300);
+	setMotorSpeed(PICKUP_BELT, MAX_PICKUP_SPEED);
+	delay(20000);
+}
+void skills(){
+	setFlywheelTarget(1300);
+	setMotorSpeed(PICKUP_BELT, MAX_PICKUP_SPEED);
+}
+
+void operatorControl() {
+	driving();
 }
